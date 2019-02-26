@@ -60,7 +60,7 @@ type MovieAPI struct {
 }
 
 type BelongsToCollection struct {
-	ID           int    `json:"id"`
+	CollectionID int    `json:"id"`
 	Name         string `json:"name"`
 	PosterPath   string `json:"poster_path"`
 	BackdropPath string `json:"backdrop_path"`

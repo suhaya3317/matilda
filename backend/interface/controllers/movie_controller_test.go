@@ -91,7 +91,7 @@ func (movie *MockMovieAPIRepository) Find(cxt context.Context, id string) (*http
 		Adult:        false,
 		BackdropPath: "/aQXTw3wIWuFMy0beXRiZ1xVKtcf.jpg",
 		BelongsToCollection: domain.BelongsToCollection{
-			ID:           0,
+			CollectionID: 0,
 			Name:         "",
 			PosterPath:   "",
 			BackdropPath: "",
@@ -174,7 +174,7 @@ func (movie *MockMovieAPIRepository) FindInfo(ctx context.Context, id string) (*
 		Adult:        false,
 		BackdropPath: "/aQXTw3wIWuFMy0beXRiZ1xVKtcf.jpg",
 		BelongsToCollection: domain.BelongsToCollection{
-			ID:           0,
+			CollectionID: 0,
 			Name:         "",
 			PosterPath:   "",
 			BackdropPath: "",
