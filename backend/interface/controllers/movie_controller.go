@@ -52,25 +52,58 @@ func (controller *MovieController) GetMovies(w http.ResponseWriter, r *http.Requ
 	}
 	defer res.Body.Close()
 
-	movies := new(domain.Movies)
-	err = json.Unmarshal(body, movies)
+	moviesAPI := new(domain.MoviesAPI)
+	err = json.Unmarshal(body, moviesAPI)
 	if err != nil {
 		return appErrorf(err, "json.Unmarshal()")
 	}
 
-	var matildaMovies []*domain.MatildaMovie
-	for i := range movies.Results {
-		matildaMovies = append(matildaMovies, &domain.MatildaMovie{
-			ID:         movies.Results[i].ID,
-			Title:      movies.Results[i].Title,
-			PosterPath: "https://image.tmdb.org/t/p/w300_and_h450_bestv2" + movies.Results[i].PosterPath,
+	var domainMovies []*domain.Movie
+	for i := range moviesAPI.Results {
+		domainMovies = append(domainMovies, &domain.Movie{
+			ID:         moviesAPI.Results[i].ID,
+			Title:      moviesAPI.Results[i].Title,
+			PosterPath: "https://image.tmdb.org/t/p/w300_and_h450_bestv2" + moviesAPI.Results[i].PosterPath,
 		})
 	}
 
-	err = setResponseWriter(w, 200, matildaMovies)
+	err = setResponseWriter(w, 200, domainMovies)
 	if err != nil {
 		return appErrorf(err, "%v", err)
 	}
 	controller.LogInterceptor.LogInfo(ctx, "success: %v", "GetMovies()")
+	return nil
+}
+
+func (controller *MovieController) GetMovie(w http.ResponseWriter, r *http.Request) *appError {
+	ctx := appengine.NewContext(r)
+	res, err := controller.MovieAPIInterceptor.GetMovie(ctx, controller.MuxInterceptor.Get(r, "movieID"))
+	if err != nil {
+		return appErrorf(err, "controller.MovieAPIInterceptor.GetMovie()")
+	}
+
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return appErrorf(err, "ioutil.ReadAll()")
+	}
+	defer res.Body.Close()
+
+	movieAPI := new(domain.MovieAPI)
+	err = json.Unmarshal(body, movieAPI)
+	if err != nil {
+		return appErrorf(err, "json.Unmarshal()")
+	}
+
+	var domainMovie domain.Movie
+	domainMovie.ID = movieAPI.ID
+	domainMovie.Title = movieAPI.Title
+	domainMovie.PosterPath = "https://image.tmdb.org/t/p/w300_and_h450_bestv2" + movieAPI.PosterPath
+
+	err = setResponseWriter(w, 200, domainMovie)
+	if err != nil {
+		return appErrorf(err, "setResponseWriter()")
+	}
+
+	controller.LogInterceptor.LogInfo(ctx, "success: %v", "GetMovie()")
 	return nil
 }
