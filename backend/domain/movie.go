@@ -88,16 +88,17 @@ type SpokenLanguages struct {
 	Name      string `json:"name"`
 }
 
-// TODO: 監督名の取得
 type MovieInformation struct {
 	ID          int      `json:"id"`
 	ReleaseDate string   `json:"release_date"`
+	Director    string   `json:"director"`
 	Cast        []string `json:"cast"`
 	Detail      string   `json:"detail"`
 }
 
 type Credits struct {
 	Cast []Cast `json:"cast"`
+	Crew []Crew `json:"crew"`
 }
 
 type Cast struct {
@@ -108,5 +109,15 @@ type Cast struct {
 	ID          int    `json:"id"`
 	Name        string `json:"name"`
 	Order       int    `json:"order"`
+	ProfilePath string `json:"profile_path"`
+}
+
+type Crew struct {
+	CreditID    string `json:"credit_id"`
+	Department  string `json:"department"`
+	Gender      int    `json:"gender"`
+	ID          int    `json:"id"`
+	Job         string `json:"job"`
+	Name        string `json:"name"`
 	ProfilePath string `json:"profile_path"`
 }
