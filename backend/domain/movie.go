@@ -56,6 +56,7 @@ type MovieAPI struct {
 	Video               bool                  `json:"video"`
 	VoteAverage         float64               `json:"vote_average"`
 	VoteCount           int                   `json:"vote_count"`
+	Credits             Credits               `json:"credits"`
 }
 
 type BelongsToCollection struct {
@@ -85,4 +86,27 @@ type ProductionCountries struct {
 type SpokenLanguages struct {
 	Iso_639_1 string `json:"iso_639_1"`
 	Name      string `json:"name"`
+}
+
+// TODO: 監督名の取得
+type MovieInformation struct {
+	ID          int      `json:"id"`
+	ReleaseDate string   `json:"release_date"`
+	Cast        []string `json:"cast"`
+	Detail      string   `json:"detail"`
+}
+
+type Credits struct {
+	Cast []Cast `json:"cast"`
+}
+
+type Cast struct {
+	CastID      int    `json:"cast_id"`
+	Character   string `json:"character"`
+	CreditId    string `json:"credit_id"`
+	Gender      int    `json:"gender"`
+	ID          int    `json:"id"`
+	Name        string `json:"name"`
+	Order       int    `json:"order"`
+	ProfilePath string `json:"profile_path"`
 }
