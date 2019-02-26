@@ -21,6 +21,10 @@ func (interceptor *MovieAPIInterceptor) GetPopularMovies(ctx context.Context, pa
 	return interceptor.MovieAPIRepository.FindAll(ctx, page)
 }
 
+func (interceptor *MovieAPIInterceptor) GetMovie(ctx context.Context, id string) (*http.Response, error) {
+	return interceptor.MovieAPIRepository.Find(ctx, id)
+}
+
 type LogInterceptor struct {
 	LogRepository LogRepository
 }

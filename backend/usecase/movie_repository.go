@@ -11,6 +11,7 @@ type MovieMuxRepository interface {
 
 type MovieAPIRepository interface {
 	FindAll(context.Context, string) (*http.Response, error)
+	Find(context.Context, string) (*http.Response, error)
 }
 
 type LogRepository interface {
