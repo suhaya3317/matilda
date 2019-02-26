@@ -9,7 +9,7 @@ type MoviesAPI struct {
 
 type Results struct {
 	VoteCount        int     `json:"vote_count"`
-	ID               int     `json:"id"`
+	MovieID          int     `json:"id"`
 	Video            bool    `json:"video"`
 	VoteAverage      float64 `json:"vote_average"`
 	Title            string  `json:"title"`
@@ -25,7 +25,7 @@ type Results struct {
 }
 
 type Movie struct {
-	ID         int    `json:"id"`
+	MovieID    int    `json:"movie_id"`
 	Title      string `json:"title"`
 	PosterPath string `json:"poster_path"`
 }
@@ -37,7 +37,7 @@ type MovieAPI struct {
 	Budget              int                   `json:"budget"`
 	Genres              []Genres              `json:"genres"`
 	Homepage            string                `json:"homepage"`
-	ID                  int                   `json:"id"`
+	MovieID             int                   `json:"id"`
 	ImdbId              string                `json:"imdb_id"`
 	OriginalLanguage    string                `json:"original_language"`
 	OriginalTitle       string                `json:"original_title"`
@@ -67,15 +67,15 @@ type BelongsToCollection struct {
 }
 
 type Genres struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
+	GenreID int    `json:"id"`
+	Name    string `json:"name"`
 }
 
 type ProductionCompanies struct {
-	ID            int    `json:"id"`
-	LogoPath      string `json:"logo_path"`
-	Name          string `json:"name"`
-	OriginCountry string `json:"origin_country"`
+	ProductionCompanyID int    `json:"id"`
+	LogoPath            string `json:"logo_path"`
+	Name                string `json:"name"`
+	OriginCountry       string `json:"origin_country"`
 }
 
 type ProductionCountries struct {
@@ -89,7 +89,7 @@ type SpokenLanguages struct {
 }
 
 type MovieInformation struct {
-	ID          int      `json:"id"`
+	MovieID     int      `json:"movie_id"`
 	ReleaseDate string   `json:"release_date"`
 	Director    string   `json:"director"`
 	Cast        []string `json:"cast"`
@@ -106,7 +106,7 @@ type Cast struct {
 	Character   string `json:"character"`
 	CreditId    string `json:"credit_id"`
 	Gender      int    `json:"gender"`
-	ID          int    `json:"id"`
+	PersonID    int    `json:"id"`
 	Name        string `json:"name"`
 	Order       int    `json:"order"`
 	ProfilePath string `json:"profile_path"`
@@ -116,7 +116,7 @@ type Crew struct {
 	CreditID    string `json:"credit_id"`
 	Department  string `json:"department"`
 	Gender      int    `json:"gender"`
-	ID          int    `json:"id"`
+	PersonID    int    `json:"id"`
 	Job         string `json:"job"`
 	Name        string `json:"name"`
 	ProfilePath string `json:"profile_path"`

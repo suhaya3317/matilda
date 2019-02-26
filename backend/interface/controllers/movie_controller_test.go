@@ -57,7 +57,7 @@ func (movie *MockMovieAPIRepository) FindAll(ctx context.Context, page string) (
 		Results: []domain.Results{
 			{
 				VoteCount:        650,
-				ID:               399579,
+				MovieID:          399579,
 				Video:            false,
 				VoteAverage:      6.7,
 				Title:            "Alita: Battle Angel",
@@ -99,20 +99,20 @@ func (movie *MockMovieAPIRepository) Find(cxt context.Context, id string) (*http
 		Budget: 170000000,
 		Genres: []domain.Genres{
 			{
-				ID:   28,
-				Name: "Action",
+				GenreID: 28,
+				Name:    "Action",
 			},
 			{
-				ID:   878,
-				Name: "Science Fiction",
+				GenreID: 878,
+				Name:    "Science Fiction",
 			},
 			{
-				ID:   53,
-				Name: "Thriller",
+				GenreID: 53,
+				Name:    "Thriller",
 			},
 		},
 		Homepage:         "https://www.foxmovies.com/movies/alita-battle-angel",
-		ID:               399579,
+		MovieID:          399579,
 		ImdbId:           "tt0437086",
 		OriginalLanguage: "en",
 		OriginalTitle:    "Alita: Battle Angel",
@@ -121,16 +121,16 @@ func (movie *MockMovieAPIRepository) Find(cxt context.Context, id string) (*http
 		PosterPath:       "/xRWht48C2V8XNfzvPehyClOvDni.jpg",
 		ProductionCompanies: []domain.ProductionCompanies{
 			{
-				ID:            10807,
-				LogoPath:      "/j0BcMaJKIiDDYHq9lriTcM0Npka.png",
-				Name:          "Troublemaker Studios",
-				OriginCountry: "US",
+				ProductionCompanyID: 10807,
+				LogoPath:            "/j0BcMaJKIiDDYHq9lriTcM0Npka.png",
+				Name:                "Troublemaker Studios",
+				OriginCountry:       "US",
 			},
 			{
-				ID:            574,
-				LogoPath:      "/iB6GjNVHs5hOqcEYt2rcjBqIjki.png",
-				Name:          "Lightstorm Entertainment",
-				OriginCountry: "US",
+				ProductionCompanyID: 574,
+				LogoPath:            "/iB6GjNVHs5hOqcEYt2rcjBqIjki.png",
+				Name:                "Lightstorm Entertainment",
+				OriginCountry:       "US",
 			},
 		},
 		ProductionCountries: []domain.ProductionCountries{
@@ -182,20 +182,20 @@ func (movie *MockMovieAPIRepository) FindInfo(ctx context.Context, id string) (*
 		Budget: 170000000,
 		Genres: []domain.Genres{
 			{
-				ID:   28,
-				Name: "Action",
+				GenreID: 28,
+				Name:    "Action",
 			},
 			{
-				ID:   878,
-				Name: "Science Fiction",
+				GenreID: 878,
+				Name:    "Science Fiction",
 			},
 			{
-				ID:   53,
-				Name: "Thriller",
+				GenreID: 53,
+				Name:    "Thriller",
 			},
 		},
 		Homepage:         "https://www.foxmovies.com/movies/alita-battle-angel",
-		ID:               399579,
+		MovieID:          399579,
 		ImdbId:           "tt0437086",
 		OriginalLanguage: "en",
 		OriginalTitle:    "Alita: Battle Angel",
@@ -204,16 +204,16 @@ func (movie *MockMovieAPIRepository) FindInfo(ctx context.Context, id string) (*
 		PosterPath:       "/xRWht48C2V8XNfzvPehyClOvDni.jpg",
 		ProductionCompanies: []domain.ProductionCompanies{
 			{
-				ID:            10807,
-				LogoPath:      "/j0BcMaJKIiDDYHq9lriTcM0Npka.png",
-				Name:          "Troublemaker Studios",
-				OriginCountry: "US",
+				ProductionCompanyID: 10807,
+				LogoPath:            "/j0BcMaJKIiDDYHq9lriTcM0Npka.png",
+				Name:                "Troublemaker Studios",
+				OriginCountry:       "US",
 			},
 			{
-				ID:            574,
-				LogoPath:      "/iB6GjNVHs5hOqcEYt2rcjBqIjki.png",
-				Name:          "Lightstorm Entertainment",
-				OriginCountry: "US",
+				ProductionCompanyID: 574,
+				LogoPath:            "/iB6GjNVHs5hOqcEYt2rcjBqIjki.png",
+				Name:                "Lightstorm Entertainment",
+				OriginCountry:       "US",
 			},
 		},
 		ProductionCountries: []domain.ProductionCountries{
@@ -244,7 +244,7 @@ func (movie *MockMovieAPIRepository) FindInfo(ctx context.Context, id string) (*
 					Character:   "Alita",
 					CreditId:    "57484f43c3a3683cd8000d87",
 					Gender:      1,
-					ID:          973667,
+					PersonID:    973667,
 					Name:        "Rosa Salazar",
 					Order:       0,
 					ProfilePath: "/bwY3wWrpG3YqIWiwFbHkN3zSUEk.jpg",
@@ -255,7 +255,7 @@ func (movie *MockMovieAPIRepository) FindInfo(ctx context.Context, id string) (*
 					CreditID:    "57484f2792514135d100262d",
 					Department:  "Directing",
 					Gender:      2,
-					ID:          2294,
+					PersonID:    2294,
 					Job:         "Director",
 					Name:        "Robert Rodriguez",
 					ProfilePath: "/bPqRdLWWwpOT8sBdj9PWOzNgwou.jpg",
@@ -308,7 +308,7 @@ func TestMovieController_GetMovies(t *testing.T) {
 	}
 
 	actual := string(body)
-	expected := `[{"id":399579,"title":"Alita: Battle Angel","poster_path":"https://image.tmdb.org/t/p/w300_and_h450_bestv2/xRWht48C2V8XNfzvPehyClOvDni.jpg"}]`
+	expected := `[{"movie_id":399579,"title":"Alita: Battle Angel","poster_path":"https://image.tmdb.org/t/p/w300_and_h450_bestv2/xRWht48C2V8XNfzvPehyClOvDni.jpg"}]`
 
 	err = IsEqualJSON(actual, expected)
 	if err != nil {
@@ -345,7 +345,7 @@ func TestMovieController_GetMovie(t *testing.T) {
 	}
 
 	actual := string(body)
-	expected := `{"id":399579,"title":"Alita: Battle Angel","poster_path":"https://image.tmdb.org/t/p/w300_and_h450_bestv2/xRWht48C2V8XNfzvPehyClOvDni.jpg"}`
+	expected := `{"movie_id":399579,"title":"Alita: Battle Angel","poster_path":"https://image.tmdb.org/t/p/w300_and_h450_bestv2/xRWht48C2V8XNfzvPehyClOvDni.jpg"}`
 
 	err = IsEqualJSON(actual, expected)
 	if err != nil {
@@ -382,7 +382,7 @@ func TestMovieController_GetMovieInformation(t *testing.T) {
 	}
 
 	actual := string(body)
-	expected := `{"id":399579,"release_date":"2019-01-31","director":"Robert Rodriguez","cast":["Rosa Salazar"],"detail":"When Alita awakens with no memory of who she is in a future world she does not recognize, she is taken in by Ido, a compassionate doctor who realizes that somewhere in this abandoned cyborg shell is the heart and soul of a young woman with an extraordinary past."}`
+	expected := `{"movie_id":399579,"release_date":"2019-01-31","director":"Robert Rodriguez","cast":["Rosa Salazar"],"detail":"When Alita awakens with no memory of who she is in a future world she does not recognize, she is taken in by Ido, a compassionate doctor who realizes that somewhere in this abandoned cyborg shell is the heart and soul of a young woman with an extraordinary past."}`
 
 	err = IsEqualJSON(actual, expected)
 	if err != nil {

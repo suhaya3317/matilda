@@ -61,7 +61,7 @@ func (controller *MovieController) GetMovies(w http.ResponseWriter, r *http.Requ
 	var domainMovies []*domain.Movie
 	for i := range moviesAPI.Results {
 		domainMovies = append(domainMovies, &domain.Movie{
-			ID:         moviesAPI.Results[i].ID,
+			MovieID:    moviesAPI.Results[i].MovieID,
 			Title:      moviesAPI.Results[i].Title,
 			PosterPath: "https://image.tmdb.org/t/p/w300_and_h450_bestv2" + moviesAPI.Results[i].PosterPath,
 		})
@@ -95,7 +95,7 @@ func (controller *MovieController) GetMovie(w http.ResponseWriter, r *http.Reque
 	}
 
 	var domainMovie domain.Movie
-	domainMovie.ID = movieAPI.ID
+	domainMovie.MovieID = movieAPI.MovieID
 	domainMovie.Title = movieAPI.Title
 	domainMovie.PosterPath = "https://image.tmdb.org/t/p/w300_and_h450_bestv2" + movieAPI.PosterPath
 
@@ -128,7 +128,7 @@ func (controller *MovieController) GetMovieInformation(w http.ResponseWriter, r 
 	}
 
 	var domainMovieInfo domain.MovieInformation
-	domainMovieInfo.ID = movieAPI.ID
+	domainMovieInfo.MovieID = movieAPI.MovieID
 	domainMovieInfo.ReleaseDate = movieAPI.ReleaseDate
 
 	for i := range movieAPI.Credits.Crew {
