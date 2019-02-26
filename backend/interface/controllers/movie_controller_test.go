@@ -250,6 +250,17 @@ func (movie *MockMovieAPIRepository) FindInfo(ctx context.Context, id string) (*
 					ProfilePath: "/bwY3wWrpG3YqIWiwFbHkN3zSUEk.jpg",
 				},
 			},
+			Crew: []domain.Crew{
+				{
+					CreditID:    "57484f2792514135d100262d",
+					Department:  "Directing",
+					Gender:      2,
+					ID:          2294,
+					Job:         "Director",
+					Name:        "Robert Rodriguez",
+					ProfilePath: "/bPqRdLWWwpOT8sBdj9PWOzNgwou.jpg",
+				},
+			},
 		},
 	}
 
@@ -371,7 +382,7 @@ func TestMovieController_GetMovieInformation(t *testing.T) {
 	}
 
 	actual := string(body)
-	expected := `{"id":399579,"release_date":"2019-01-31","cast":["Rosa Salazar"],"detail":"When Alita awakens with no memory of who she is in a future world she does not recognize, she is taken in by Ido, a compassionate doctor who realizes that somewhere in this abandoned cyborg shell is the heart and soul of a young woman with an extraordinary past."}`
+	expected := `{"id":399579,"release_date":"2019-01-31","director":"Robert Rodriguez","cast":["Rosa Salazar"],"detail":"When Alita awakens with no memory of who she is in a future world she does not recognize, she is taken in by Ido, a compassionate doctor who realizes that somewhere in this abandoned cyborg shell is the heart and soul of a young woman with an extraordinary past."}`
 
 	err = IsEqualJSON(actual, expected)
 	if err != nil {
