@@ -1,0 +1,14 @@
+runtime: go
+api_version: go1.9
+env: standard
+threadsafe: true
+instance_class: F1
+
+includes:
+    - dev.yaml
+
+handlers:
+- url: /.*
+  script: _go_app
+  secure: always
+  redirect_http_response_code: 301

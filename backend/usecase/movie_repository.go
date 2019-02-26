@@ -1,0 +1,18 @@
+package usecase
+
+import (
+	"context"
+	"net/http"
+)
+
+type MovieMuxRepository interface {
+	Find(*http.Request, string) string
+}
+
+type MovieAPIRepository interface {
+	FindAll(context.Context, string) (*http.Response, error)
+}
+
+type LogRepository interface {
+	Output(context.Context, string, interface{})
+}
