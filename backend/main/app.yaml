@@ -4,6 +4,9 @@ env: standard
 threadsafe: true
 instance_class: F1
 
+includes:
+    - dev.yaml
+
 handlers:
 - url: /.*
   script: _go_app
