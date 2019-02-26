@@ -31,3 +31,11 @@ func (handler *MovieAPIHandler) GetPopularMovies(ctx context.Context, page strin
 	}
 	return res, nil
 }
+
+func (handler *MovieAPIHandler) GetMovie(ctx context.Context, id string) (*http.Response, error) {
+	res, err := handler.Client(ctx).Get("https://api.themoviedb.org/3/movie/" + id + "?api_key=" + handler.APIKey)
+	if err != nil {
+		return nil, err
+	}
+	return res, err
+}
