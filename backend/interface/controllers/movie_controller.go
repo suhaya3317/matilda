@@ -130,9 +130,18 @@ func (controller *MovieController) GetMovieInformation(w http.ResponseWriter, r 
 	var domainMovieInfo domain.MovieInformation
 	domainMovieInfo.ID = movieAPI.ID
 	domainMovieInfo.ReleaseDate = movieAPI.ReleaseDate
+
+	for i := range movieAPI.Credits.Crew {
+		if movieAPI.Credits.Crew[i].Job == "Director" {
+			domainMovieInfo.Director = movieAPI.Credits.Crew[i].Name
+			break
+		}
+	}
+
 	for i := range movieAPI.Credits.Cast {
 		domainMovieInfo.Cast = append(domainMovieInfo.Cast, movieAPI.Credits.Cast[i].Name)
 	}
+
 	domainMovieInfo.Detail = movieAPI.Overview
 
 	err = setResponseWriter(w, 200, domainMovieInfo)
