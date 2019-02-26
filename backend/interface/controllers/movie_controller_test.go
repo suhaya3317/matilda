@@ -168,6 +168,103 @@ func (movie *MockMovieAPIRepository) Find(cxt context.Context, id string) (*http
 	return res, nil
 }
 
+func (movie *MockMovieAPIRepository) FindInfo(ctx context.Context, id string) (*http.Response, error) {
+	var movieAPI domain.MovieAPI
+	movieAPI = domain.MovieAPI{
+		Adult:        false,
+		BackdropPath: "/aQXTw3wIWuFMy0beXRiZ1xVKtcf.jpg",
+		BelongsToCollection: domain.BelongsToCollection{
+			ID:           0,
+			Name:         "",
+			PosterPath:   "",
+			BackdropPath: "",
+		},
+		Budget: 170000000,
+		Genres: []domain.Genres{
+			{
+				ID:   28,
+				Name: "Action",
+			},
+			{
+				ID:   878,
+				Name: "Science Fiction",
+			},
+			{
+				ID:   53,
+				Name: "Thriller",
+			},
+		},
+		Homepage:         "https://www.foxmovies.com/movies/alita-battle-angel",
+		ID:               399579,
+		ImdbId:           "tt0437086",
+		OriginalLanguage: "en",
+		OriginalTitle:    "Alita: Battle Angel",
+		Overview:         "When Alita awakens with no memory of who she is in a future world she does not recognize, she is taken in by Ido, a compassionate doctor who realizes that somewhere in this abandoned cyborg shell is the heart and soul of a young woman with an extraordinary past.",
+		Popularity:       492.344,
+		PosterPath:       "/xRWht48C2V8XNfzvPehyClOvDni.jpg",
+		ProductionCompanies: []domain.ProductionCompanies{
+			{
+				ID:            10807,
+				LogoPath:      "/j0BcMaJKIiDDYHq9lriTcM0Npka.png",
+				Name:          "Troublemaker Studios",
+				OriginCountry: "US",
+			},
+			{
+				ID:            574,
+				LogoPath:      "/iB6GjNVHs5hOqcEYt2rcjBqIjki.png",
+				Name:          "Lightstorm Entertainment",
+				OriginCountry: "US",
+			},
+		},
+		ProductionCountries: []domain.ProductionCountries{
+			{
+				Iso_3166_1: "AR",
+				Name:       "Argentina",
+			},
+		},
+		ReleaseDate: "2019-01-31",
+		Revenue:     263358391,
+		Runtime:     122,
+		SpokenLanguages: []domain.SpokenLanguages{
+			{
+				Iso_639_1: "en",
+				Name:      "English",
+			},
+		},
+		Status:      "Released",
+		Tagline:     "An angel falls. A warrior rises.",
+		Title:       "Alita: Battle Angel",
+		Video:       false,
+		VoteAverage: 6.9,
+		VoteCount:   891,
+		Credits: domain.Credits{
+			Cast: []domain.Cast{
+				{
+					CastID:      2,
+					Character:   "Alita",
+					CreditId:    "57484f43c3a3683cd8000d87",
+					Gender:      1,
+					ID:          973667,
+					Name:        "Rosa Salazar",
+					Order:       0,
+					ProfilePath: "/bwY3wWrpG3YqIWiwFbHkN3zSUEk.jpg",
+				},
+			},
+		},
+	}
+
+	body, err := json.Marshal(movieAPI)
+	if err != nil {
+		return nil, err
+	}
+
+	res := &http.Response{
+		StatusCode: http.StatusOK,
+		Body:       ioutil.NopCloser(bytes.NewReader(body)),
+	}
+	return res, nil
+}
+
 func (log *MockLogRepository) Output(ctx context.Context, format string, args interface{}) {
 }
 
@@ -238,6 +335,43 @@ func TestMovieController_GetMovie(t *testing.T) {
 
 	actual := string(body)
 	expected := `{"id":399579,"title":"Alita: Battle Angel","poster_path":"https://image.tmdb.org/t/p/w300_and_h450_bestv2/xRWht48C2V8XNfzvPehyClOvDni.jpg"}`
+
+	err = IsEqualJSON(actual, expected)
+	if err != nil {
+		t.Fatalf("Failed to IsEqualJson: %v", err)
+	}
+}
+
+func TestMovieController_GetMovieInformation(t *testing.T) {
+	inst, err := aetest.NewInstance(nil)
+	if err != nil {
+		t.Fatalf("Failed to create instance: %v", err)
+	}
+	defer inst.Close()
+
+	req, err := inst.NewRequest("GET", "/api/v1/movies/399579/information", nil)
+	if err != nil {
+		t.Fatalf("Failed to create req: %v", err)
+	}
+
+	res := httptest.NewRecorder()
+
+	apErr := target.GetMovieInformation(res, req)
+	if apErr != nil {
+		t.Fatalf("GetMovieInformation error: %v", apErr)
+	}
+
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		t.Fatalf("Failed to read res.Body: %v", err)
+	}
+
+	if res.Code != 200 {
+		t.Fatalf("StatusCode: %v, Response.Body: %v", res.Code, body)
+	}
+
+	actual := string(body)
+	expected := `{"id":399579,"release_date":"2019-01-31","cast":["Rosa Salazar"],"detail":"When Alita awakens with no memory of who she is in a future world she does not recognize, she is taken in by Ido, a compassionate doctor who realizes that somewhere in this abandoned cyborg shell is the heart and soul of a young woman with an extraordinary past."}`
 
 	err = IsEqualJSON(actual, expected)
 	if err != nil {
