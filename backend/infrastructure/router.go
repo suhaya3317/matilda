@@ -23,5 +23,7 @@ func RegisterHandlers() {
 		Handler(controllers.AppHandler(movieController.GetMovies))
 	r.Methods("GET").Path("/api/v1/movies/{movieID}").
 		Handler(controllers.AppHandler(movieController.GetMovie))
+	r.Methods("GET").Path("/api/v1/movies/{movieID}/information").
+		Handler(controllers.AppHandler(movieController.GetMovieInformation))
 	http.Handle("/", handlers.CombinedLoggingHandler(os.Stdout, r))
 }
