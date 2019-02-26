@@ -25,6 +25,10 @@ func (interceptor *MovieAPIInterceptor) GetMovie(ctx context.Context, id string)
 	return interceptor.MovieAPIRepository.Find(ctx, id)
 }
 
+func (interceptor *MovieAPIInterceptor) GetMovieInformation(ctx context.Context, id string) (*http.Response, error) {
+	return interceptor.MovieAPIRepository.FindInfo(ctx, id)
+}
+
 type LogInterceptor struct {
 	LogRepository LogRepository
 }

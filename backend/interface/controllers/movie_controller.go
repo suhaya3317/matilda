@@ -61,7 +61,7 @@ func (controller *MovieController) GetMovies(w http.ResponseWriter, r *http.Requ
 	var domainMovies []*domain.Movie
 	for i := range moviesAPI.Results {
 		domainMovies = append(domainMovies, &domain.Movie{
-			ID:         moviesAPI.Results[i].ID,
+			MovieID:    moviesAPI.Results[i].MovieID,
 			Title:      moviesAPI.Results[i].Title,
 			PosterPath: "https://image.tmdb.org/t/p/w300_and_h450_bestv2" + moviesAPI.Results[i].PosterPath,
 		})
@@ -95,7 +95,7 @@ func (controller *MovieController) GetMovie(w http.ResponseWriter, r *http.Reque
 	}
 
 	var domainMovie domain.Movie
-	domainMovie.ID = movieAPI.ID
+	domainMovie.MovieID = movieAPI.MovieID
 	domainMovie.Title = movieAPI.Title
 	domainMovie.PosterPath = "https://image.tmdb.org/t/p/w300_and_h450_bestv2" + movieAPI.PosterPath
 
@@ -105,5 +105,50 @@ func (controller *MovieController) GetMovie(w http.ResponseWriter, r *http.Reque
 	}
 
 	controller.LogInterceptor.LogInfo(ctx, "success: %v", "GetMovie()")
+	return nil
+}
+
+func (controller *MovieController) GetMovieInformation(w http.ResponseWriter, r *http.Request) *appError {
+	ctx := appengine.NewContext(r)
+	res, err := controller.MovieAPIInterceptor.GetMovieInformation(ctx, controller.MuxInterceptor.Get(r, "movieID"))
+	if err != nil {
+		return appErrorf(err, "controller.MovieAPIInterceptor.GetMovie()")
+	}
+
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return appErrorf(err, "ioutil.ReadAll()")
+	}
+	defer res.Body.Close()
+
+	movieAPI := new(domain.MovieAPI)
+	err = json.Unmarshal(body, movieAPI)
+	if err != nil {
+		return appErrorf(err, "json.Unmarshal()")
+	}
+
+	var domainMovieInfo domain.MovieInformation
+	domainMovieInfo.MovieID = movieAPI.MovieID
+	domainMovieInfo.ReleaseDate = movieAPI.ReleaseDate
+
+	for i := range movieAPI.Credits.Crew {
+		if movieAPI.Credits.Crew[i].Job == "Director" {
+			domainMovieInfo.Director = movieAPI.Credits.Crew[i].Name
+			break
+		}
+	}
+
+	for i := range movieAPI.Credits.Cast {
+		domainMovieInfo.Cast = append(domainMovieInfo.Cast, movieAPI.Credits.Cast[i].Name)
+	}
+
+	domainMovieInfo.Detail = movieAPI.Overview
+
+	err = setResponseWriter(w, 200, domainMovieInfo)
+	if err != nil {
+		return appErrorf(err, "setResponseWriter()")
+	}
+
+	controller.LogInterceptor.LogInfo(ctx, "success: %v", "GetMovieInformation()")
 	return nil
 }

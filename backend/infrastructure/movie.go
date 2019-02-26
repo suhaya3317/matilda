@@ -39,3 +39,11 @@ func (handler *MovieAPIHandler) GetMovie(ctx context.Context, id string) (*http.
 	}
 	return res, err
 }
+
+func (handler *MovieAPIHandler) GetMovieInformation(ctx context.Context, id string) (*http.Response, error) {
+	res, err := handler.Client(ctx).Get("https://api.themoviedb.org/3/movie/" + id + "?api_key=" + handler.APIKey + "&append_to_response=credits")
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
