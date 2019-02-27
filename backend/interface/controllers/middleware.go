@@ -2,11 +2,28 @@ package controllers
 
 import (
 	"fmt"
+	"matilda/backend/interface/firebase_interface"
+	"matilda/backend/usecase"
 	"net/http"
+	"strings"
 
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/log"
 )
+
+type FirebaseController struct {
+	MiddlewareInterceptor usecase.MiddlewareInterceptor
+}
+
+func NewFirebaseController(firebaseHandler firebase_interface.FirebaseHandler) *FirebaseController {
+	return &FirebaseController{
+		MiddlewareInterceptor: usecase.MiddlewareInterceptor{
+			MiddlewareRepository: &firebase_interface.MiddlewareRepository{
+				FirebaseHandler: firebaseHandler,
+			},
+		},
+	}
+}
 
 type AppHandler func(http.ResponseWriter, *http.Request) *appError
 
@@ -32,5 +49,22 @@ func appErrorf(err error, format string, v ...interface{}) *appError {
 		Error:   err,
 		Message: fmt.Sprintf(format, v...),
 		Code:    500,
+	}
+}
+
+func (controller *FirebaseController) AuthMiddleware(ah AppHandler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := appengine.NewContext(r)
+
+		authHeader := r.Header.Get("Authorization")
+		idToken := strings.Replace(authHeader, "Bearer ", "", 1)
+
+		statusCode, err := controller.MiddlewareInterceptor.Auth(ctx, idToken)
+		if err != nil {
+			log.Errorf(ctx, "AuthMiddleware error: %v", err)
+			setResponseWriter(w, statusCode, err)
+			return
+		}
+		ah.ServeHTTP(w, r)
 	}
 }
