@@ -13,17 +13,19 @@ import (
 func RegisterHandlers() {
 	r := mux.NewRouter().StrictSlash(true)
 
+	firebaseHandler := NewFirebaseHandler()
 	gorillaMuxHandler := NewGorillaMuxHandler()
 	movieAPIHandler := NewMovieAPIHandler()
 	logHandler := NewLogHandler()
 
+	firebaseController := controllers.NewFirebaseController(firebaseHandler)
 	movieController := controllers.NewMovieController(gorillaMuxHandler, movieAPIHandler, logHandler)
 
 	r.Methods("GET").Path("/api/v1/movies").Queries("page", "{page}").
-		Handler(controllers.AppHandler(movieController.GetMovies))
+		Handler(firebaseController.AuthMiddleware(controllers.AppHandler(movieController.GetMovies)))
 	r.Methods("GET").Path("/api/v1/movies/{movieID}").
-		Handler(controllers.AppHandler(movieController.GetMovie))
+		Handler(firebaseController.AuthMiddleware(controllers.AppHandler(movieController.GetMovie)))
 	r.Methods("GET").Path("/api/v1/movies/{movieID}/information").
-		Handler(controllers.AppHandler(movieController.GetMovieInformation))
+		Handler(firebaseController.AuthMiddleware(controllers.AppHandler(movieController.GetMovieInformation)))
 	http.Handle("/", handlers.CombinedLoggingHandler(os.Stdout, r))
 }

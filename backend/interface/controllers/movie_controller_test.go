@@ -7,33 +7,13 @@ import (
 	"errors"
 	"io/ioutil"
 	"matilda/backend/domain"
-	"matilda/backend/usecase"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"reflect"
 	"testing"
 
 	"google.golang.org/appengine/aetest"
 )
-
-var target MovieController
-
-func TestMain(m *testing.M) {
-	target = MovieController{
-		MuxInterceptor: usecase.MovieMuxInterceptor{
-			MovieMuxRepository: &MockMovieMuxRepository{},
-		},
-		MovieAPIInterceptor: usecase.MovieAPIInterceptor{
-			MovieAPIRepository: &MockMovieAPIRepository{},
-		},
-		LogInterceptor: usecase.LogInterceptor{
-			LogRepository: &MockLogRepository{},
-		},
-	}
-	code := m.Run()
-	os.Exit(code)
-}
 
 type MockMovieMuxRepository struct {
 }
@@ -293,7 +273,7 @@ func TestMovieController_GetMovies(t *testing.T) {
 
 	res := httptest.NewRecorder()
 
-	apErr := target.GetMovies(res, req)
+	apErr := TargetMovie.GetMovies(res, req)
 	if apErr != nil {
 		t.Fatalf("GetMovies error: %v", apErr)
 	}
@@ -330,7 +310,7 @@ func TestMovieController_GetMovie(t *testing.T) {
 
 	res := httptest.NewRecorder()
 
-	apErr := target.GetMovie(res, req)
+	apErr := TargetMovie.GetMovie(res, req)
 	if apErr != nil {
 		t.Fatalf("GetMovie error: %v", apErr)
 	}
@@ -367,7 +347,7 @@ func TestMovieController_GetMovieInformation(t *testing.T) {
 
 	res := httptest.NewRecorder()
 
-	apErr := target.GetMovieInformation(res, req)
+	apErr := TargetMovie.GetMovieInformation(res, req)
 	if apErr != nil {
 		t.Fatalf("GetMovieInformation error: %v", apErr)
 	}
