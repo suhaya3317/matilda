@@ -2,10 +2,10 @@ package logging
 
 import "context"
 
-type LogRepository struct {
+type LogMovieRepository struct {
 	LogHandler
 }
 
-func (repo *LogRepository) Output(ctx context.Context, format string, args interface{}) {
+func (repo *LogMovieRepository) Output(ctx context.Context, format string, args interface{}) {
 	repo.LogInfo(ctx, format, args)
 }

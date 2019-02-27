@@ -16,8 +16,8 @@ func TestMain(m *testing.M) {
 		MovieAPIInterceptor: usecase.MovieAPIInterceptor{
 			MovieAPIRepository: &MockMovieAPIRepository{},
 		},
-		LogInterceptor: usecase.LogInterceptor{
-			LogRepository: &MockLogRepository{},
+		LogInterceptor: usecase.LogMovieInterceptor{
+			LogMovieRepository: &MockLogRepository{},
 		},
 	}
 	code := m.Run()
