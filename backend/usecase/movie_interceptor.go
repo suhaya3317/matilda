@@ -29,10 +29,10 @@ func (interceptor *MovieAPIInterceptor) GetMovieInformation(ctx context.Context,
 	return interceptor.MovieAPIRepository.FindInfo(ctx, id)
 }
 
-type LogInterceptor struct {
-	LogRepository LogRepository
+type LogMovieInterceptor struct {
+	LogMovieRepository LogMovieRepository
 }
 
-func (interceptor *LogInterceptor) LogInfo(ctx context.Context, format string, args interface{}) {
-	interceptor.LogRepository.Output(ctx, format, args)
+func (interceptor *LogMovieInterceptor) LogInfo(ctx context.Context, format string, args interface{}) {
+	interceptor.LogMovieRepository.Output(ctx, format, args)
 }

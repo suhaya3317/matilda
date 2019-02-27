@@ -16,7 +16,7 @@ import (
 type MovieController struct {
 	MuxInterceptor      usecase.MovieMuxInterceptor
 	MovieAPIInterceptor usecase.MovieAPIInterceptor
-	LogInterceptor      usecase.LogInterceptor
+	LogInterceptor      usecase.LogMovieInterceptor
 }
 
 func NewMovieController(gorillaMuxHandler gorilla_mux.GorillaMuxHandler, movieAPIHandler movie.MovieAPIHandler, logHandler logging.LogHandler) *MovieController {
@@ -31,8 +31,8 @@ func NewMovieController(gorillaMuxHandler gorilla_mux.GorillaMuxHandler, movieAP
 				MovieAPIHandler: movieAPIHandler,
 			},
 		},
-		LogInterceptor: usecase.LogInterceptor{
-			LogRepository: &logging.LogRepository{
+		LogInterceptor: usecase.LogMovieInterceptor{
+			LogMovieRepository: &logging.LogMovieRepository{
 				LogHandler: logHandler,
 			},
 		},

@@ -15,6 +15,6 @@ type MovieAPIRepository interface {
 	FindInfo(context.Context, string) (*http.Response, error)
 }
 
-type LogRepository interface {
+type LogMovieRepository interface {
 	Output(context.Context, string, interface{})
 }
