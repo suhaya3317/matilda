@@ -1,9 +1,15 @@
 package controllers
 
 import (
+	"errors"
+	"matilda/backend/domain/entity"
 	"matilda/backend/interface/database"
 	"matilda/backend/interface/logging"
 	"matilda/backend/usecase"
+	"net/http"
+	"time"
+
+	"google.golang.org/appengine"
 )
 
 type UserController struct {
@@ -24,4 +30,36 @@ func NewUserController(datastoreHandler database.DatastoreHandler, logHandler lo
 			},
 		},
 	}
+}
+
+func (controller *UserController) CreateUser(w http.ResponseWriter, r *http.Request) *appError {
+	ctx := appengine.NewContext(r)
+	sub, ok, err := getSub(r, ctx)
+	if err != nil {
+		return appErrorf(err, "getSub() error: %v", err)
+	}
+	if ok == false {
+		err := errors.New("could not get sub")
+		return appErrorf(err, "getSub() ok: %v", err)
+	}
+
+	var u entity.User
+	u.UserID = sub
+	u.Name = "test name"
+	u.IconPath = "test path"
+	u.CreatedAt = time.Now()
+	u.UpdatedAt = time.Now()
+
+	_, err = controller.DatastoreUserInterceptor.Put(r, &u)
+	if err != nil {
+		return appErrorf(err, "controller.DatastoreUserInterceptor.Put() error: %v", err)
+	}
+
+	err = setResponseWriter(w, 202, err)
+	if err != nil {
+		return appErrorf(err, "setResponseWriter() error: %v", err)
+	}
+
+	controller.LogUserInterceptor.LogInfo(ctx, "CreateUser() user_id: %v", sub)
+	return nil
 }

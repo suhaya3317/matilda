@@ -15,12 +15,16 @@ func RegisterHandlers() {
 
 	firebaseHandler := NewFirebaseHandler()
 	gorillaMuxHandler := NewGorillaMuxHandler()
+	datastoreHandler := NewDatastoreHandler()
 	movieAPIHandler := NewMovieAPIHandler()
 	logHandler := NewLogHandler()
 
 	firebaseController := controllers.NewFirebaseController(firebaseHandler)
+	userController := controllers.NewUserController(datastoreHandler, logHandler)
 	movieController := controllers.NewMovieController(gorillaMuxHandler, movieAPIHandler, logHandler)
 
+	r.Methods("PUT").Path("/api/v1/users").
+		Handler(firebaseController.AuthMiddleware(controllers.AppHandler(userController.CreateUser)))
 	r.Methods("GET").Path("/api/v1/movies").Queries("page", "{page}").
 		Handler(firebaseController.AuthMiddleware(controllers.AppHandler(movieController.GetMovies)))
 	r.Methods("GET").Path("/api/v1/movies/{movieID}").
