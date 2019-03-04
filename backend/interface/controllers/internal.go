@@ -8,7 +8,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func getidToken(r *http.Request) string {
+func getIDToken(r *http.Request) string {
 	authHeader := r.Header.Get("Authorization")
 	idToken := strings.Replace(authHeader, "Bearer ", "", 1)
 	return idToken
