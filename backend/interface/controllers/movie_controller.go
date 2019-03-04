@@ -43,19 +43,19 @@ func (controller *MovieController) GetMovies(w http.ResponseWriter, r *http.Requ
 	ctx := appengine.NewContext(r)
 	res, err := controller.MovieAPIInterceptor.GetPopularMovies(ctx, controller.MuxInterceptor.Get(r, "page"))
 	if err != nil {
-		return appErrorf(err, "controller.MovieAPIInterceptor.GetPopularMovies()")
+		return appErrorf(err, "controller.MovieAPIInterceptor.GetPopularMovies() error: %v", err)
 	}
 
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return appErrorf(err, "ioutil.ReadAll()")
+		return appErrorf(err, "ioutil.ReadAll() error: %v", err)
 	}
 	defer res.Body.Close()
 
 	moviesAPI := new(domain.MoviesAPI)
 	err = json.Unmarshal(body, moviesAPI)
 	if err != nil {
-		return appErrorf(err, "json.Unmarshal()")
+		return appErrorf(err, "json.Unmarshal() error: %v", err)
 	}
 
 	var domainMovies []*domain.Movie
@@ -69,7 +69,7 @@ func (controller *MovieController) GetMovies(w http.ResponseWriter, r *http.Requ
 
 	err = setResponseWriter(w, 200, domainMovies)
 	if err != nil {
-		return appErrorf(err, "%v", err)
+		return appErrorf(err, "setResponseWriter() error: %v", err)
 	}
 	controller.LogInterceptor.LogInfo(ctx, "success: %v", "GetMovies()")
 	return nil
@@ -79,19 +79,19 @@ func (controller *MovieController) GetMovie(w http.ResponseWriter, r *http.Reque
 	ctx := appengine.NewContext(r)
 	res, err := controller.MovieAPIInterceptor.GetMovie(ctx, controller.MuxInterceptor.Get(r, "movieID"))
 	if err != nil {
-		return appErrorf(err, "controller.MovieAPIInterceptor.GetMovie()")
+		return appErrorf(err, "controller.MovieAPIInterceptor.GetMovie() error: %v", err)
 	}
 
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return appErrorf(err, "ioutil.ReadAll()")
+		return appErrorf(err, "ioutil.ReadAll() error: %v", err)
 	}
 	defer res.Body.Close()
 
 	movieAPI := new(domain.MovieAPI)
 	err = json.Unmarshal(body, movieAPI)
 	if err != nil {
-		return appErrorf(err, "json.Unmarshal()")
+		return appErrorf(err, "json.Unmarshal() error: %v", err)
 	}
 
 	var domainMovie domain.Movie
@@ -101,7 +101,7 @@ func (controller *MovieController) GetMovie(w http.ResponseWriter, r *http.Reque
 
 	err = setResponseWriter(w, 200, domainMovie)
 	if err != nil {
-		return appErrorf(err, "setResponseWriter()")
+		return appErrorf(err, "setResponseWriter() error: %v", err)
 	}
 
 	controller.LogInterceptor.LogInfo(ctx, "success: %v", "GetMovie()")
@@ -112,19 +112,19 @@ func (controller *MovieController) GetMovieInformation(w http.ResponseWriter, r 
 	ctx := appengine.NewContext(r)
 	res, err := controller.MovieAPIInterceptor.GetMovieInformation(ctx, controller.MuxInterceptor.Get(r, "movieID"))
 	if err != nil {
-		return appErrorf(err, "controller.MovieAPIInterceptor.GetMovie()")
+		return appErrorf(err, "controller.MovieAPIInterceptor.GetMovie() error: %v", err)
 	}
 
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return appErrorf(err, "ioutil.ReadAll()")
+		return appErrorf(err, "ioutil.ReadAll() error: %v", err)
 	}
 	defer res.Body.Close()
 
 	movieAPI := new(domain.MovieAPI)
 	err = json.Unmarshal(body, movieAPI)
 	if err != nil {
-		return appErrorf(err, "json.Unmarshal()")
+		return appErrorf(err, "json.Unmarshal() error: %v", err)
 	}
 
 	var domainMovieInfo domain.MovieInformation
@@ -146,7 +146,7 @@ func (controller *MovieController) GetMovieInformation(w http.ResponseWriter, r 
 
 	err = setResponseWriter(w, 200, domainMovieInfo)
 	if err != nil {
-		return appErrorf(err, "setResponseWriter()")
+		return appErrorf(err, "setResponseWriter() error: %v", err)
 	}
 
 	controller.LogInterceptor.LogInfo(ctx, "success: %v", "GetMovieInformation()")
