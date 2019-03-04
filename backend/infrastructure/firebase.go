@@ -2,9 +2,17 @@ package infrastructure
 
 import (
 	"context"
+	"crypto/rsa"
+	"crypto/x509"
+	"encoding/json"
+	"encoding/pem"
+	"fmt"
 	"matilda/backend/interface/firebase_interface"
 	"net/http"
 	"os"
+	"strings"
+
+	"github.com/dgrijalva/jwt-go"
 
 	"github.com/pkg/errors"
 
@@ -60,6 +68,34 @@ func (handler *FirebaseHandler) Auth(ctx context.Context, idToken string) (int, 
 	return 200, nil
 }
 
-func (handler *FirebaseHandler) GetCertIDTokenURL(client *http.Client) (*http.Response, error) {
+func (handler *FirebaseHandler) GetPublicKey(client *http.Client) (*http.Response, error) {
 	return client.Get(clientCertURL)
+}
+
+func (handler *FirebaseHandler) ParseJWT(idToken string, keys map[string]*json.RawMessage) (*jwt.Token, error) {
+	return jwt.Parse(idToken, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
+			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+		}
+		kid := token.Header["kid"]
+		rsaPublicKey := convertKey(string(*keys[kid.(string)]))
+		return rsaPublicKey, nil
+	})
+}
+
+func (handler *FirebaseHandler) GetSub(parsedToken *jwt.Token) (string, bool) {
+	tokenMap := parsedToken.Claims.(jwt.MapClaims)
+	sub, ok := tokenMap["sub"].(string)
+	return sub, ok
+}
+
+func convertKey(key string) interface{} {
+	certPEM := key
+	certPEM = strings.Replace(certPEM, "\\n", "\n", -1)
+	certPEM = strings.Replace(certPEM, "\"", "", -1)
+	block, _ := pem.Decode([]byte(certPEM))
+	cert, _ := x509.ParseCertificate(block.Bytes)
+	rsaPublicKey := cert.PublicKey.(*rsa.PublicKey)
+
+	return rsaPublicKey
 }

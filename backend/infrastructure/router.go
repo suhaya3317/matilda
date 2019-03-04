@@ -20,7 +20,7 @@ func RegisterHandlers() {
 	logHandler := NewLogHandler()
 
 	firebaseController := controllers.NewFirebaseController(firebaseHandler)
-	userController := controllers.NewUserController(datastoreHandler, logHandler)
+	userController := controllers.NewUserController(datastoreHandler, logHandler, firebaseHandler)
 	movieController := controllers.NewMovieController(gorillaMuxHandler, movieAPIHandler, logHandler)
 
 	r.Methods("PUT").Path("/api/v1/users").
