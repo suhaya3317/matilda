@@ -9,6 +9,7 @@ import (
 	"matilda/backend/domain"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"reflect"
 	"testing"
 
@@ -270,6 +271,7 @@ func TestMovieController_GetMovies(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create req: %v", err)
 	}
+	req.Header.Set("Authorization", "Bearer: "+os.Getenv("TEST_AUTH_TOKEN"))
 
 	res := httptest.NewRecorder()
 
@@ -307,6 +309,7 @@ func TestMovieController_GetMovie(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create req: %v", err)
 	}
+	req.Header.Set("Authorization", "Bearer: "+os.Getenv("TEST_AUTH_TOKEN"))
 
 	res := httptest.NewRecorder()
 
@@ -344,6 +347,7 @@ func TestMovieController_GetMovieInformation(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create req: %v", err)
 	}
+	req.Header.Set("Authorization", "Bearer: "+os.Getenv("TEST_AUTH_TOKEN"))
 
 	res := httptest.NewRecorder()
 
