@@ -44,7 +44,7 @@ func NewUserController(datastoreHandler database.DatastoreHandler, logHandler lo
 func (controller *UserController) CreateUser(w http.ResponseWriter, r *http.Request) *appError {
 	ctx := appengine.NewContext(r)
 
-	idToken := getidToken(r)
+	idToken := getIDToken(r)
 
 	client := urlfetch.Client(ctx)
 	resp, err := controller.FirebaseUserInterceptor.GetPublicKey(client)
