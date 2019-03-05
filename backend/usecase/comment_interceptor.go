@@ -4,6 +4,8 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/mjibson/goon"
+
 	"google.golang.org/appengine/datastore"
 )
 
@@ -25,6 +27,18 @@ func (interceptor *DatastoreCommentInterceptor) Put(r *http.Request, src interfa
 
 func (interceptor *DatastoreCommentInterceptor) GetKey(r *http.Request, src interface{}) *datastore.Key {
 	return interceptor.DatastoreCommentRepository.FindKey(r, src)
+}
+
+func (interceptor *DatastoreCommentInterceptor) GetMulti(r *http.Request, src interface{}) error {
+	return interceptor.DatastoreCommentRepository.FindMulti(r, src)
+}
+
+func (interceptor *DatastoreCommentInterceptor) Run(r *http.Request, query *datastore.Query) *goon.Iterator {
+	return interceptor.DatastoreCommentRepository.RunQuery(r, query)
+}
+
+func (interceptor *DatastoreCommentInterceptor) Next(it *goon.Iterator) (*datastore.Key, error) {
+	return interceptor.DatastoreCommentRepository.NextQuery(it)
 }
 
 type LogCommentInterceptor struct {
