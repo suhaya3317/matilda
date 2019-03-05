@@ -43,7 +43,7 @@ func NewCommentController(gorillaMuxHandler gorilla_mux.GorillaMuxHandler, datas
 func (controller *CommentController) CreateComment(w http.ResponseWriter, r *http.Request) *appError {
 	ctx := appengine.NewContext(r)
 
-	sub, err := getUserID(r, ctx, Common)
+	sub, err := getUserID(r, ctx)
 	if err != nil {
 		return appErrorf(err, "getUserID() error: %v", err)
 	}

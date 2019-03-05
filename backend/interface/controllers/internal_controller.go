@@ -30,11 +30,11 @@ func NewInternalController(firebaseHandler firebase_interface.FirebaseHandler) *
 	}
 }
 
-func getUserID(r *http.Request, ctx context.Context, controller *InternalController) (string, error) {
+func getUserID(r *http.Request, ctx context.Context) (string, error) {
 	idToken := getIDToken(r)
 
 	client := urlfetch.Client(ctx)
-	resp, err := controller.FirebaseInternalInterceptor.GetPublicKey(client)
+	resp, err := Common.FirebaseInternalInterceptor.GetPublicKey(client)
 	if err != nil {
 		err = errors2.Wrap(err, "controller.FirebaseInternalInterceptor.GetPublicKey()")
 		return "", err
@@ -46,13 +46,13 @@ func getUserID(r *http.Request, ctx context.Context, controller *InternalControl
 		return "", err
 	}
 
-	parsedToken, err := controller.FirebaseInternalInterceptor.ParseJWT(idToken, keys)
+	parsedToken, err := Common.FirebaseInternalInterceptor.ParseJWT(idToken, keys)
 	if err != nil {
 		err = errors2.Wrap(err, "controller.FirebaseInternalInterceptor.ParseJWT()")
 		return "", err
 	}
 
-	sub, ok := controller.FirebaseInternalInterceptor.GetSub(parsedToken)
+	sub, ok := Common.FirebaseInternalInterceptor.GetSub(parsedToken)
 	if ok == false {
 		err := errors.New("controller.FirebaseInternalInterceptor.GetSub(): could not get sub")
 		return "", err

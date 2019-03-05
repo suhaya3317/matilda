@@ -35,7 +35,7 @@ func NewUserController(datastoreHandler database.DatastoreHandler, logHandler lo
 func (controller *UserController) CreateUser(w http.ResponseWriter, r *http.Request) *appError {
 	ctx := appengine.NewContext(r)
 
-	sub, err := getUserID(r, ctx, Common)
+	sub, err := getUserID(r, ctx)
 	if err != nil {
 		return appErrorf(err, "getUserID() error: %v", err)
 	}
