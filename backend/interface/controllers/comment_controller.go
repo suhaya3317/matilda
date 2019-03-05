@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"context"
 	"errors"
 	"matilda/backend/domain/entity"
 	"matilda/backend/interface/database"
@@ -12,6 +13,7 @@ import (
 	"strconv"
 	"time"
 
+	errors2 "github.com/pkg/errors"
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/urlfetch"
 )
@@ -51,28 +53,13 @@ func NewCommentController(gorillaMuxHandler gorilla_mux.GorillaMuxHandler, fireb
 func (controller *CommentController) CreateComment(w http.ResponseWriter, r *http.Request) *appError {
 	ctx := appengine.NewContext(r)
 
-	idToken := getIDToken(r)
-
-	client := urlfetch.Client(ctx)
-	resp, err := controller.FirebaseCommentInterceptor.GetPublicKey(client)
+	sub, err := controller.getUserID(r, ctx)
 	if err != nil {
-		return appErrorf(err, "controller.FirebaseCommentInterceptor.GetPublicKey() error: %v", err)
+		return appErrorf(err, "controller.getUserID() error: %v", err)
 	}
-
-	keys, err := decodePublicKeys(resp)
-	if err != nil {
-		return appErrorf(err, "decodePublicKeys() error: %v", err)
-	}
-
-	parsedToken, err := controller.FirebaseCommentInterceptor.ParseJWT(idToken, keys)
-	if err != nil {
-		return appErrorf(err, "controller.FirebaseCommentInterceptor.ParseJWT() error: %v", err)
-	}
-
-	sub, ok := controller.FirebaseCommentInterceptor.GetSub(parsedToken)
-	if ok == false {
+	if sub == "" {
 		err := errors.New("could not get sub")
-		return appErrorf(err, "controller.FirebaseCommentInterceptor.GetSub() error: %v", err)
+		return appErrorf(err, "controller.getUserID() error: %v", err)
 	}
 
 	u := &entity.User{UserID: sub}
@@ -110,4 +97,34 @@ func (controller *CommentController) CreateComment(w http.ResponseWriter, r *htt
 
 	controller.LogCommentInterceptor.LogInfo(ctx, "CreateComment() user_id: %v", sub)
 	return nil
+}
+
+func (controller *CommentController) getUserID(r *http.Request, ctx context.Context) (string, error) {
+	idToken := getIDToken(r)
+
+	client := urlfetch.Client(ctx)
+	resp, err := controller.FirebaseCommentInterceptor.GetPublicKey(client)
+	if err != nil {
+		err = errors2.Wrap(err, "controller.FirebaseCommentInterceptor.GetPublicKey()")
+		return "", err
+	}
+
+	keys, err := decodePublicKeys(resp)
+	if err != nil {
+		err = errors2.Wrap(err, "decodePublicKeys()")
+		return "", err
+	}
+
+	parsedToken, err := controller.FirebaseCommentInterceptor.ParseJWT(idToken, keys)
+	if err != nil {
+		err = errors2.Wrap(err, "controller.FirebaseCommentInterceptor.ParseJWT()")
+		return "", err
+	}
+
+	sub, ok := controller.FirebaseCommentInterceptor.GetSub(parsedToken)
+	if ok == false {
+		err := errors.New("controller.FirebaseCommentInterceptor.GetSub(): could not get sub")
+		return "", err
+	}
+	return sub, nil
 }

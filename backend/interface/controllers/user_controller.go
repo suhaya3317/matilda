@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"context"
 	"errors"
 	"matilda/backend/domain/entity"
 	"matilda/backend/interface/database"
@@ -10,6 +11,7 @@ import (
 	"net/http"
 	"time"
 
+	errors2 "github.com/pkg/errors"
 	"google.golang.org/appengine/urlfetch"
 
 	"google.golang.org/appengine"
@@ -44,28 +46,13 @@ func NewUserController(datastoreHandler database.DatastoreHandler, logHandler lo
 func (controller *UserController) CreateUser(w http.ResponseWriter, r *http.Request) *appError {
 	ctx := appengine.NewContext(r)
 
-	idToken := getIDToken(r)
-
-	client := urlfetch.Client(ctx)
-	resp, err := controller.FirebaseUserInterceptor.GetPublicKey(client)
+	sub, err := controller.getUserID(r, ctx)
 	if err != nil {
-		return appErrorf(err, "controller.FirebaseUserInterceptor.GetPublicKey() error: %v", err)
+		return appErrorf(err, "controller.getUserID() error: %v", err)
 	}
-
-	keys, err := decodePublicKeys(resp)
-	if err != nil {
-		return appErrorf(err, "decodePublicKeys() error: %v", err)
-	}
-
-	parsedToken, err := controller.FirebaseUserInterceptor.ParseJWT(idToken, keys)
-	if err != nil {
-		return appErrorf(err, "controller.FirebaseUserInterceptor.ParseJWT() error: %v", err)
-	}
-
-	sub, ok := controller.FirebaseUserInterceptor.GetSub(parsedToken)
-	if ok == false {
+	if sub == "" {
 		err := errors.New("could not get sub")
-		return appErrorf(err, "getSub() ok: %v", err)
+		return appErrorf(err, "controller.getUserID() error: %v", err)
 	}
 
 	var u entity.User
@@ -87,4 +74,34 @@ func (controller *UserController) CreateUser(w http.ResponseWriter, r *http.Requ
 
 	controller.LogUserInterceptor.LogInfo(ctx, "CreateUser() user_id: %v", sub)
 	return nil
+}
+
+func (controller *UserController) getUserID(r *http.Request, ctx context.Context) (string, error) {
+	idToken := getIDToken(r)
+
+	client := urlfetch.Client(ctx)
+	resp, err := controller.FirebaseUserInterceptor.GetPublicKey(client)
+	if err != nil {
+		err = errors2.Wrap(err, "controller.FirebaseUserInterceptor.GetPublicKey()")
+		return "", err
+	}
+
+	keys, err := decodePublicKeys(resp)
+	if err != nil {
+		err = errors2.Wrap(err, "decodePublicKeys()")
+		return "", err
+	}
+
+	parsedToken, err := controller.FirebaseUserInterceptor.ParseJWT(idToken, keys)
+	if err != nil {
+		err = errors2.Wrap(err, "controller.FirebaseUserInterceptor.ParseJWT()")
+		return "", err
+	}
+
+	sub, ok := controller.FirebaseUserInterceptor.GetSub(parsedToken)
+	if ok == false {
+		err := errors.New("controller.FirebaseUserInterceptor.GetSub(): could not get sub")
+		return "", err
+	}
+	return sub, nil
 }
