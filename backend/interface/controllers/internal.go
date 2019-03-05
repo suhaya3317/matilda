@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"io/ioutil"
 	"net/http"
 	"strings"
 
@@ -21,6 +22,20 @@ func decodePublicKeys(resp *http.Response) (map[string]*json.RawMessage, error) 
 	err = errors.Wrap(err, "decoder.Decode()")
 
 	return objmap, err
+}
+
+func mappingJsonToStruct(r *http.Request, src interface{}) error {
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return err
+	}
+	if err := r.Body.Close(); err != nil {
+		return err
+	}
+	if err := json.Unmarshal(body, &src); err != nil {
+		return err
+	}
+	return nil
 }
 
 func setResponseWriter(w http.ResponseWriter, statusCode int, src interface{}) error {
