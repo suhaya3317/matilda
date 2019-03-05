@@ -29,3 +29,15 @@ func (handler *DatastoreHandler) Put(r *http.Request, src interface{}) (*datasto
 func (handler *DatastoreHandler) GetKey(r *http.Request, src interface{}) *datastore.Key {
 	return handler.Conn(r).Key(src)
 }
+
+func (handler *DatastoreHandler) GetMulti(r *http.Request, src interface{}) error {
+	return handler.Conn(r).GetMulti(src)
+}
+
+func (handler *DatastoreHandler) Run(r *http.Request, query *datastore.Query) *goon.Iterator {
+	return handler.Conn(r).Run(query)
+}
+
+func (handler *DatastoreHandler) Next(it *goon.Iterator) (*datastore.Key, error) {
+	return it.Next(nil)
+}
