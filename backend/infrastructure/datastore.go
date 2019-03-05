@@ -25,3 +25,7 @@ func NewDatastoreHandler() database.DatastoreHandler {
 func (handler *DatastoreHandler) Put(r *http.Request, src interface{}) (*datastore.Key, error) {
 	return handler.Conn(r).Put(src)
 }
+
+func (handler *DatastoreHandler) GetKey(r *http.Request, src interface{}) *datastore.Key {
+	return handler.Conn(r).Key(src)
+}
