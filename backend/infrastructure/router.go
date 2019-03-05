@@ -22,6 +22,7 @@ func RegisterHandlers() {
 	firebaseController := controllers.NewFirebaseController(firebaseHandler)
 	userController := controllers.NewUserController(datastoreHandler, logHandler, firebaseHandler)
 	movieController := controllers.NewMovieController(gorillaMuxHandler, movieAPIHandler, logHandler)
+	commentController := controllers.NewCommentController(datastoreHandler, logHandler)
 
 	r.Methods("PUT").Path("/api/v1/users").
 		Handler(firebaseController.AuthMiddleware(controllers.AppHandler(userController.CreateUser)))
@@ -31,5 +32,7 @@ func RegisterHandlers() {
 		Handler(firebaseController.AuthMiddleware(controllers.AppHandler(movieController.GetMovie)))
 	r.Methods("GET").Path("/api/v1/movies/{movieID}/information").
 		Handler(firebaseController.AuthMiddleware(controllers.AppHandler(movieController.GetMovieInformation)))
+	r.Methods("PUT").Path("/api/v1/movies/{movieID}/comments").
+		Handler(firebaseController.AuthMiddleware(controllers.AppHandler(commentController.CreateComment)))
 	http.Handle("/", handlers.CombinedLoggingHandler(os.Stdout, r))
 }
