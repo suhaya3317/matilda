@@ -13,3 +13,7 @@ type DatastoreCommentRepository struct {
 func (repo *DatastoreCommentRepository) Store(r *http.Request, src interface{}) (*datastore.Key, error) {
 	return repo.Put(r, src)
 }
+
+func (repo *DatastoreCommentRepository) FindKey(r *http.Request, src interface{}) *datastore.Key {
+	return repo.GetKey(r, src)
+}
