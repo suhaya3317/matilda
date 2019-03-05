@@ -2,10 +2,7 @@ package usecase
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
-
-	"github.com/dgrijalva/jwt-go"
 
 	"google.golang.org/appengine/datastore"
 )
@@ -36,20 +33,4 @@ type LogCommentInterceptor struct {
 
 func (interceptor *LogCommentInterceptor) LogInfo(ctx context.Context, format string, args interface{}) {
 	interceptor.LogCommentRepository.Output(ctx, format, args)
-}
-
-type FirebaseCommentInterceptor struct {
-	FirebaseCommentRepository FirebaseCommentRepository
-}
-
-func (interceptor *FirebaseCommentInterceptor) GetPublicKey(client *http.Client) (*http.Response, error) {
-	return interceptor.FirebaseCommentRepository.FindPublicKey(client)
-}
-
-func (interceptor *FirebaseCommentInterceptor) ParseJWT(idToken string, keys map[string]*json.RawMessage) (*jwt.Token, error) {
-	return interceptor.FirebaseCommentRepository.ParseToken(idToken, keys)
-}
-
-func (interceptor *FirebaseCommentInterceptor) GetSub(parsedToken *jwt.Token) (string, bool) {
-	return interceptor.FirebaseCommentRepository.FindSub(parsedToken)
 }
