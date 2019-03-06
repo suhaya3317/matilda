@@ -35,5 +35,7 @@ func RegisterHandlers() {
 		Handler(firebaseController.AuthMiddleware(controllers.AppHandler(movieController.GetMovieInformation)))
 	r.Methods("PUT").Path("/api/v1/movies/{movieID}/comments").
 		Handler(firebaseController.AuthMiddleware(controllers.AppHandler(commentController.CreateComment)))
+	r.Methods("GET").Path("/api/v1/movies/{movieID}/comments").
+		Handler(firebaseController.AuthMiddleware(controllers.AppHandler(commentController.GetComments)))
 	http.Handle("/", handlers.CombinedLoggingHandler(os.Stdout, r))
 }

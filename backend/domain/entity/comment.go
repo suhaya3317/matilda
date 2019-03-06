@@ -11,7 +11,7 @@ type Comment struct {
 	CommentText string         `json:"comment_text" datastore:"comment_text"`
 	Deleted     bool           `json:"deleted" datastore:"deleted"`
 	MovieID     int            `json:"movie_id" datastore:"movie_id"`
-	UserKey     *datastore.Key `json:"user_key" datastore:"user_key" goon:"parent"`
+	UserKey     *datastore.Key `json:"user_key" datastore:"user_key"`
 	CreatedAt   time.Time      `json:"created_at" datastore:"created_at"`
 	UpdatedAt   time.Time      `json:"updated_at" datastore:"updated_at"`
 }
