@@ -1,12 +1,18 @@
 package controllers
 
 import (
+	"encoding/json"
+	"errors"
+	"matilda/backend/infrastructure"
+	"matilda/backend/interface/database"
+	"matilda/backend/interface/logging"
+	"matilda/backend/interface/movie"
 	"matilda/backend/usecase"
 	"os"
+	"reflect"
 	"testing"
 )
 
-var TargetUser *UserController
 var TargetMovie *MovieController
 var TargetComment *CommentController
 
@@ -16,12 +22,16 @@ type publicKey struct {
 }
 
 func TestMain(m *testing.M) {
+	movieAPIHandler := infrastructure.NewMovieAPIHandler()
+	datastoreHandler := infrastructure.NewDatastoreHandler()
+	logHandler := infrastructure.NewLogHandler()
+
 	Common = &InternalController{
 		FirebaseInternalInterceptor: usecase.FirebaseInternalInterceptor{
 			FirebaseInternalRepository: &MockFirebaseInternalRepository{},
 		},
 	}
-	TargetUser = &UserController{
+	UserHandler = &UserController{
 		DatastoreUserInterceptor: usecase.DatastoreUserInterceptor{
 			DatastoreUserRepository: &MockDatastoreUserRepository{},
 		},
@@ -35,10 +45,14 @@ func TestMain(m *testing.M) {
 			MovieMuxRepository: &MockMovieMuxRepository{},
 		},
 		MovieAPIInterceptor: usecase.MovieAPIInterceptor{
-			MovieAPIRepository: &MockMovieAPIRepository{},
+			MovieAPIRepository: &movie.MovieAPIRepository{
+				MovieAPIHandler: movieAPIHandler,
+			},
 		},
 		LogInterceptor: usecase.LogMovieInterceptor{
-			LogMovieRepository: &MockLogRepository{},
+			LogMovieRepository: &logging.LogMovieRepository{
+				LogHandler: logHandler,
+			},
 		},
 	}
 
@@ -47,7 +61,9 @@ func TestMain(m *testing.M) {
 			MuxCommentRepository: &MockMuxCommentRepository{},
 		},
 		DatastoreCommentInterceptor: usecase.DatastoreCommentInterceptor{
-			DatastoreCommentRepository: &MockDatastoreCommentRepository{},
+			DatastoreCommentRepository: &database.DatastoreCommentRepository{
+				DatastoreHandler: datastoreHandler,
+			},
 		},
 		LogCommentInterceptor: usecase.LogCommentInterceptor{
 			LogCommentRepository: &MockLogCommentRepository{},
@@ -55,4 +71,40 @@ func TestMain(m *testing.M) {
 	}
 	code := m.Run()
 	os.Exit(code)
+}
+
+func IsEqualJSON(a, b string) error {
+	err, ok := DeepEqualJSON(a, b)
+	if err != nil {
+		return err
+	}
+	if ok {
+		return nil
+	}
+	err = errors.New("not Equal")
+	return err
+}
+
+func DeepEqualJSON(j1, j2 string) (error, bool) {
+	var err error
+
+	var d1 interface{}
+	err = json.Unmarshal([]byte(j1), &d1)
+
+	if err != nil {
+		return err, false
+	}
+
+	var d2 interface{}
+	err = json.Unmarshal([]byte(j2), &d2)
+
+	if err != nil {
+		return err, false
+	}
+
+	if reflect.DeepEqual(d1, d2) {
+		return nil, true
+	} else {
+		return nil, false
+	}
 }

@@ -3,10 +3,9 @@ package controllers
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/dgrijalva/jwt-go"
 	"io/ioutil"
 	"net/http"
-
-	"github.com/dgrijalva/jwt-go"
 )
 
 type MockFirebaseInternalRepository struct {
