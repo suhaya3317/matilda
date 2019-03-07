@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"matilda/backend/domain/entity"
 	"net/http"
 
 	"google.golang.org/appengine/datastore"
@@ -13,6 +14,10 @@ type DatastoreUserInterceptor struct {
 
 func (interceptor *DatastoreUserInterceptor) Put(r *http.Request, src interface{}) (*datastore.Key, error) {
 	return interceptor.DatastoreUserRepository.Store(r, src)
+}
+
+func (interceptor *DatastoreUserInterceptor) GetMulti(r *http.Request, src []*entity.User) error {
+	return interceptor.DatastoreUserRepository.FindMulti(r, src)
 }
 
 type LogUserInterceptor struct {

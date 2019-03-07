@@ -11,6 +11,8 @@ import (
 
 	"github.com/pkg/errors"
 	errors2 "github.com/pkg/errors"
+	"google.golang.org/appengine"
+	"google.golang.org/appengine/datastore"
 	"google.golang.org/appengine/urlfetch"
 )
 
@@ -73,6 +75,24 @@ func decodePublicKeys(resp *http.Response) (map[string]*json.RawMessage, error) 
 	err = errors.Wrap(err, "decoder.Decode()")
 
 	return objmap, err
+}
+
+func checkGetMultiErr(err error) error {
+	mErr, _ := err.(appengine.MultiError)
+	for _, e := range mErr {
+		if e == nil {
+			// entityが存在する
+			continue
+		}
+		if e == datastore.ErrNoSuchEntity {
+			// entityが存在しないけど正常系とみなすのでスルーする
+			continue
+		}
+		// datastore.ErrNoSuchEntity以外のエラー
+		err = errors2.Wrap(err, "controller.DatastoreCommentInterceptor.GetMulti()")
+		return err
+	}
+	return nil
 }
 
 func mappingJsonToStruct(r *http.Request, src interface{}) error {

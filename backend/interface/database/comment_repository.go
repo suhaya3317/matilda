@@ -1,6 +1,7 @@
 package database
 
 import (
+	"matilda/backend/domain/entity"
 	"net/http"
 
 	"github.com/mjibson/goon"
@@ -20,7 +21,7 @@ func (repo *DatastoreCommentRepository) FindKey(r *http.Request, src interface{}
 	return repo.GetKey(r, src)
 }
 
-func (repo *DatastoreCommentRepository) FindMulti(r *http.Request, src interface{}) error {
+func (repo *DatastoreCommentRepository) FindMulti(r *http.Request, src []*entity.Comment) error {
 	return repo.GetMulti(r, src)
 }
 

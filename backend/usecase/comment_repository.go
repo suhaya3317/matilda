@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"matilda/backend/domain/entity"
 	"net/http"
 
 	"github.com/mjibson/goon"
@@ -16,7 +17,7 @@ type MuxCommentRepository interface {
 type DatastoreCommentRepository interface {
 	Store(*http.Request, interface{}) (*datastore.Key, error)
 	FindKey(*http.Request, interface{}) *datastore.Key
-	FindMulti(*http.Request, interface{}) error
+	FindMulti(*http.Request, []*entity.Comment) error
 	RunQuery(*http.Request, *datastore.Query) *goon.Iterator
 	NextQuery(*goon.Iterator) (*datastore.Key, error)
 }

@@ -12,6 +12,8 @@ import (
 	"google.golang.org/appengine"
 )
 
+var UserHandler *UserController
+
 type UserController struct {
 	DatastoreUserInterceptor usecase.DatastoreUserInterceptor
 	LogUserInterceptor       usecase.LogUserInterceptor
