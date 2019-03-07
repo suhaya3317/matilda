@@ -101,9 +101,42 @@ func (controller *CommentController) GetComments(w http.ResponseWriter, r *http.
 		return appErrorf(err, "getUserID() error: %v", err)
 	}
 
+	entityComments, err := controller.setCommentIdToEntityComments(r)
+	if err != nil {
+		return appErrorf(err, "controller.setCommentIdToEntityComments() error: %v", err)
+	}
+
+	err = controller.DatastoreCommentInterceptor.GetMulti(r, entityComments)
+	err = checkGetMultiErr(err)
+	if err != nil {
+		return appErrorf(err, "checkGetMultiErr() error: %v", err)
+	}
+
+	comments := controller.setEntityCommentsToComments(entityComments, sub)
+
+	entityUsers := controller.setUserIdtoEntityUsers(comments)
+
+	err = UserHandler.DatastoreUserInterceptor.GetMulti(r, entityUsers)
+	err = checkGetMultiErr(err)
+	if err != nil {
+		return appErrorf(err, "checkGetMultiErr() error: %v", err)
+	}
+
+	controller.setEntityUsersToComments(comments, entityUsers)
+
+	err = setResponseWriter(w, 200, &comments)
+	if err != nil {
+		return appErrorf(err, "setResponseWriter() error: %v", err)
+	}
+	controller.LogCommentInterceptor.LogInfo(ctx, "GetComments() user_id: %v", sub)
+	return nil
+}
+
+func (controller *CommentController) setCommentIdToEntityComments(r *http.Request) ([]*entity.Comment, error) {
 	commentKeys, err := controller.getCommentKeys(r)
 	if err != nil {
-		return appErrorf(err, "controller.getCommentKeys() error: %v", err)
+		err = errors2.Wrap(err, "controller.getCommentKeys()")
+		return nil, err
 	}
 
 	var commentIDs []int64
@@ -118,60 +151,7 @@ func (controller *CommentController) GetComments(w http.ResponseWriter, r *http.
 			CommentID: commentID,
 		})
 	}
-
-	entityComments, err = controller.getMultiComments(r, entityComments)
-	if err != nil {
-		return appErrorf(err, "controller.getMultiComments() error: %v", err)
-	}
-
-	var comments []*domain.Comment
-	var mine bool
-	for i := range entityComments {
-		if entityComments[i].UserKey.StringID() == sub {
-			mine = true
-		}
-		comments = append(comments, &domain.Comment{
-			CommentID:   entityComments[i].CommentID,
-			CommentText: entityComments[i].CommentText,
-			Mine:        mine,
-			CreatedAt:   entityComments[i].CreatedAt,
-			UpdatedAt:   entityComments[i].UpdatedAt,
-			UserKey:     entityComments[i].UserKey,
-			UserID:      entityComments[i].UserKey.StringID(),
-		})
-	}
-
-	userKeys := controller.getCommentUserKeys(comments)
-
-	var userIDs []string
-	for i := range userKeys {
-		userIDs = append(userIDs, userKeys[i].StringID())
-	}
-
-	var users []*entity.User
-	for i := range userIDs {
-		userID := userIDs[i]
-		users = append(users, &entity.User{
-			UserID: userID,
-		})
-	}
-
-	users, err = controller.getMultiUsers(r, users)
-	if err != nil {
-		return appErrorf(err, "controller.getMultiUsers() error: %v", err)
-	}
-
-	for i := range users {
-		comments[i].Name = users[i].Name
-		comments[i].IconPath = users[i].IconPath
-	}
-
-	err = setResponseWriter(w, 200, &comments)
-	if err != nil {
-		return appErrorf(err, "setResponseWriter() error: %v", err)
-	}
-	controller.LogCommentInterceptor.LogInfo(ctx, "GetComments() user_id: %v", sub)
-	return nil
+	return entityComments, nil
 }
 
 func (controller *CommentController) getCommentKeys(r *http.Request) ([]*datastore.Key, error) {
@@ -197,22 +177,42 @@ func (controller *CommentController) getCommentKeys(r *http.Request) ([]*datasto
 	return commentKeys, nil
 }
 
-func (controller *CommentController) getMultiComments(r *http.Request, comments []*entity.Comment) ([]*entity.Comment, error) {
-	err := controller.DatastoreCommentInterceptor.GetMulti(r, comments)
-	mErr, _ := err.(appengine.MultiError)
-	for _, e := range mErr {
-		if e == nil {
-			// entityが存在する
-			continue
+func (controller *CommentController) setEntityCommentsToComments(entityComments []*entity.Comment, sub string) []*domain.Comment {
+	var comments []*domain.Comment
+	var mine bool
+	for i := range entityComments {
+		if entityComments[i].UserKey.StringID() == sub {
+			mine = true
 		}
-		if e == datastore.ErrNoSuchEntity {
-			// entityが存在しないけど正常系とみなすのでスルーする
-			continue
-		}
-		// datastore.ErrNoSuchEntity以外のエラー
-		return nil, err
+		comments = append(comments, &domain.Comment{
+			CommentID:   entityComments[i].CommentID,
+			CommentText: entityComments[i].CommentText,
+			Mine:        mine,
+			CreatedAt:   entityComments[i].CreatedAt,
+			UpdatedAt:   entityComments[i].UpdatedAt,
+			UserKey:     entityComments[i].UserKey,
+			UserID:      entityComments[i].UserKey.StringID(),
+		})
 	}
-	return comments, nil
+	return comments
+}
+
+func (controller *CommentController) setUserIdtoEntityUsers(comments []*domain.Comment) []*entity.User {
+	userKeys := controller.getCommentUserKeys(comments)
+
+	var userIDs []string
+	for i := range userKeys {
+		userIDs = append(userIDs, userKeys[i].StringID())
+	}
+
+	var entityUsers []*entity.User
+	for i := range userIDs {
+		userID := userIDs[i]
+		entityUsers = append(entityUsers, &entity.User{
+			UserID: userID,
+		})
+	}
+	return entityUsers
 }
 
 func (controller *CommentController) getCommentUserKeys(comments []*domain.Comment) []*datastore.Key {
@@ -223,21 +223,9 @@ func (controller *CommentController) getCommentUserKeys(comments []*domain.Comme
 	return userKeys
 }
 
-func (controller *CommentController) getMultiUsers(r *http.Request, users []*entity.User) ([]*entity.User, error) {
-	err := controller.DatastoreCommentInterceptor.GetMulti(r, users)
-	mErr, _ := err.(appengine.MultiError)
-	for _, e := range mErr {
-		if e == nil {
-			// entityが存在する
-			continue
-		}
-		if e == datastore.ErrNoSuchEntity {
-			// entityが存在しないけど正常系とみなすのでスルーする
-			continue
-		}
-		// datastore.ErrNoSuchEntity以外のエラー
-		return nil, err
+func (controller *CommentController) setEntityUsersToComments(comments []*domain.Comment, entityUsers []*entity.User) {
+	for i := range entityUsers {
+		comments[i].Name = entityUsers[i].Name
+		comments[i].IconPath = entityUsers[i].IconPath
 	}
-	return users, nil
 }
-

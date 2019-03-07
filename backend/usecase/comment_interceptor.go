@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"matilda/backend/domain/entity"
 	"net/http"
 
 	"github.com/mjibson/goon"
@@ -29,7 +30,7 @@ func (interceptor *DatastoreCommentInterceptor) GetKey(r *http.Request, src inte
 	return interceptor.DatastoreCommentRepository.FindKey(r, src)
 }
 
-func (interceptor *DatastoreCommentInterceptor) GetMulti(r *http.Request, src interface{}) error {
+func (interceptor *DatastoreCommentInterceptor) GetMulti(r *http.Request, src []*entity.Comment) error {
 	return interceptor.DatastoreCommentRepository.FindMulti(r, src)
 }
 

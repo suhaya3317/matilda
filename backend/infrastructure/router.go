@@ -21,12 +21,12 @@ func RegisterHandlers() {
 
 	controllers.Common = controllers.NewInternalController(firebaseHandler)
 	firebaseController := controllers.NewFirebaseController(firebaseHandler)
-	userController := controllers.NewUserController(datastoreHandler, logHandler)
+	controllers.UserHandler = controllers.NewUserController(datastoreHandler, logHandler)
 	movieController := controllers.NewMovieController(gorillaMuxHandler, movieAPIHandler, logHandler)
 	commentController := controllers.NewCommentController(gorillaMuxHandler, datastoreHandler, logHandler)
 
 	r.Methods("PUT").Path("/api/v1/users").
-		Handler(firebaseController.AuthMiddleware(controllers.AppHandler(userController.CreateUser)))
+		Handler(firebaseController.AuthMiddleware(controllers.AppHandler(controllers.UserHandler.CreateUser)))
 	r.Methods("GET").Path("/api/v1/movies").Queries("page", "{page}").
 		Handler(firebaseController.AuthMiddleware(controllers.AppHandler(movieController.GetMovies)))
 	r.Methods("GET").Path("/api/v1/movies/{movieID}").

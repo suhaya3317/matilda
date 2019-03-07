@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"matilda/backend/domain/entity"
 	"net/http"
 
 	"google.golang.org/appengine/datastore"
@@ -9,6 +10,7 @@ import (
 
 type DatastoreUserRepository interface {
 	Store(*http.Request, interface{}) (*datastore.Key, error)
+	FindMulti(*http.Request, []*entity.User) error
 }
 
 type LogUserRepository interface {
