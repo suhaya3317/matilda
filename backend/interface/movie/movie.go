@@ -1,12 +1,11 @@
 package movie
 
 import (
-	"context"
 	"net/http"
 )
 
 type MovieAPIHandler interface {
-	GetPopularMovies(context.Context, string) (*http.Response, error)
-	GetMovie(context.Context, string) (*http.Response, error)
-	GetMovieInformation(context.Context, string) (*http.Response, error)
+	GetPopularMovies(*http.Client, string) (*http.Response, error)
+	GetMovie(*http.Client, string) (*http.Response, error)
+	GetMovieInformation(*http.Client, string) (*http.Response, error)
 }

@@ -10,9 +10,9 @@ type MovieMuxRepository interface {
 }
 
 type MovieAPIRepository interface {
-	FindAll(context.Context, string) (*http.Response, error)
-	Find(context.Context, string) (*http.Response, error)
-	FindInfo(context.Context, string) (*http.Response, error)
+	FindAll(*http.Client, string) (*http.Response, error)
+	Find(*http.Client, string) (*http.Response, error)
+	FindInfo(*http.Client, string) (*http.Response, error)
 }
 
 type LogMovieRepository interface {

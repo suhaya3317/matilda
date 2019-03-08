@@ -10,6 +10,8 @@ import (
 	"matilda/backend/usecase"
 	"net/http"
 
+	"google.golang.org/appengine/urlfetch"
+
 	"google.golang.org/appengine"
 )
 
@@ -41,7 +43,8 @@ func NewMovieController(gorillaMuxHandler gorilla_mux.GorillaMuxHandler, movieAP
 
 func (controller *MovieController) GetMovies(w http.ResponseWriter, r *http.Request) *appError {
 	ctx := appengine.NewContext(r)
-	res, err := controller.MovieAPIInterceptor.GetPopularMovies(ctx, controller.MuxInterceptor.Get(r, "page"))
+	client := urlfetch.Client(ctx)
+	res, err := controller.MovieAPIInterceptor.GetPopularMovies(client, controller.MuxInterceptor.Get(r, "page"))
 	if err != nil {
 		return appErrorf(err, "controller.MovieAPIInterceptor.GetPopularMovies() error: %v", err)
 	}
@@ -77,7 +80,8 @@ func (controller *MovieController) GetMovies(w http.ResponseWriter, r *http.Requ
 
 func (controller *MovieController) GetMovie(w http.ResponseWriter, r *http.Request) *appError {
 	ctx := appengine.NewContext(r)
-	res, err := controller.MovieAPIInterceptor.GetMovie(ctx, controller.MuxInterceptor.Get(r, "movieID"))
+	client := urlfetch.Client(ctx)
+	res, err := controller.MovieAPIInterceptor.GetMovie(client, controller.MuxInterceptor.Get(r, "movieID"))
 	if err != nil {
 		return appErrorf(err, "controller.MovieAPIInterceptor.GetMovie() error: %v", err)
 	}
@@ -110,7 +114,8 @@ func (controller *MovieController) GetMovie(w http.ResponseWriter, r *http.Reque
 
 func (controller *MovieController) GetMovieInformation(w http.ResponseWriter, r *http.Request) *appError {
 	ctx := appengine.NewContext(r)
-	res, err := controller.MovieAPIInterceptor.GetMovieInformation(ctx, controller.MuxInterceptor.Get(r, "movieID"))
+	client := urlfetch.Client(ctx)
+	res, err := controller.MovieAPIInterceptor.GetMovieInformation(client, controller.MuxInterceptor.Get(r, "movieID"))
 	if err != nil {
 		return appErrorf(err, "controller.MovieAPIInterceptor.GetMovie() error: %v", err)
 	}
