@@ -17,16 +17,16 @@ type MovieAPIInterceptor struct {
 	MovieAPIRepository MovieAPIRepository
 }
 
-func (interceptor *MovieAPIInterceptor) GetPopularMovies(ctx context.Context, page string) (*http.Response, error) {
-	return interceptor.MovieAPIRepository.FindAll(ctx, page)
+func (interceptor *MovieAPIInterceptor) GetPopularMovies(client *http.Client, page string) (*http.Response, error) {
+	return interceptor.MovieAPIRepository.FindAll(client, page)
 }
 
-func (interceptor *MovieAPIInterceptor) GetMovie(ctx context.Context, id string) (*http.Response, error) {
-	return interceptor.MovieAPIRepository.Find(ctx, id)
+func (interceptor *MovieAPIInterceptor) GetMovie(client *http.Client, id string) (*http.Response, error) {
+	return interceptor.MovieAPIRepository.Find(client, id)
 }
 
-func (interceptor *MovieAPIInterceptor) GetMovieInformation(ctx context.Context, id string) (*http.Response, error) {
-	return interceptor.MovieAPIRepository.FindInfo(ctx, id)
+func (interceptor *MovieAPIInterceptor) GetMovieInformation(client *http.Client, id string) (*http.Response, error) {
+	return interceptor.MovieAPIRepository.FindInfo(client, id)
 }
 
 type LogMovieInterceptor struct {
