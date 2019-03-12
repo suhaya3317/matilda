@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
 
 	"github.com/favclip/testerator"
@@ -31,7 +30,7 @@ func TestMovieController_GetMovies(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create req: %v", err)
 	}
-	req.Header.Set("Authorization", "Bearer: "+os.Getenv("TEST_AUTH_TOKEN"))
+	req.Header.Set("Authorization", "Bearer: "+AuthToken)
 
 	res := httptest.NewRecorder()
 
@@ -78,7 +77,7 @@ func TestMovieController_GetMovie(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create req: %v", err)
 	}
-	req.Header.Set("Authorization", "Bearer: "+os.Getenv("TEST_AUTH_TOKEN"))
+	req.Header.Set("Authorization", "Bearer: "+AuthToken)
 
 	res := httptest.NewRecorder()
 
@@ -125,7 +124,7 @@ func TestMovieController_GetMovieInformation(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create req: %v", err)
 	}
-	req.Header.Set("Authorization", "Bearer: "+os.Getenv("TEST_AUTH_TOKEN"))
+	req.Header.Set("Authorization", "Bearer: "+AuthToken)
 
 	res := httptest.NewRecorder()
 
