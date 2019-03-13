@@ -157,11 +157,20 @@ func (controller *CommentController) setCommentIdToEntityComments(r *http.Reques
 func (controller *CommentController) getCommentKeys(r *http.Request) ([]*datastore.Key, error) {
 	movieID, err := strconv.Atoi(controller.MuxCommentInterceptor.Get(r, "movieID"))
 	if err != nil {
-		err = errors2.Wrap(err, "strconv.Atoi()")
+		err = errors2.Wrap(err, "strconv.Atoi(): movieID")
 		return nil, err
 	}
 	var commentKeys []*datastore.Key
-	q := datastore.NewQuery("Comment").KeysOnly().Filter("deleted =", false).Filter("movie_id =", movieID).Order("-created_at").Limit(10)
+
+	page, err := strconv.Atoi(controller.MuxCommentInterceptor.Get(r, "page"))
+	if err != nil {
+		err = errors2.Wrap(err, "strconv.Atoi(): page")
+		return nil, err
+	}
+
+	// TODO: offsetではなくcursorで解決したい
+	q := datastore.NewQuery("Comment").KeysOnly().Filter("deleted =", false).Filter("movie_id =", movieID).Order("-created_at").Limit(10).Offset(page*10 - 10)
+
 	it := controller.DatastoreCommentInterceptor.Run(r, q)
 	for {
 		k, err := controller.DatastoreCommentInterceptor.Next(it)
