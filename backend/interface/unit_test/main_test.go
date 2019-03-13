@@ -1,6 +1,8 @@
 package unit_test
 
 import (
+	"encoding/json"
+	"matilda/backend/domain/entity"
 	"matilda/backend/infrastructure"
 	"matilda/backend/interface/controllers"
 	"matilda/backend/interface/database"
@@ -8,7 +10,11 @@ import (
 	"matilda/backend/interface/movie"
 	"matilda/backend/usecase"
 	"os"
+	"reflect"
 	"testing"
+
+	"github.com/mjibson/goon"
+	"github.com/pkg/errors"
 
 	"firebase.google.com/go"
 	"google.golang.org/api/option"
@@ -124,4 +130,64 @@ func Equal(a, b []string) bool {
 		}
 	}
 	return check
+}
+
+func deepEqualJSON(j1, j2 string) (error, bool) {
+	var err error
+
+	var d1 interface{}
+	err = json.Unmarshal([]byte(j1), &d1)
+
+	if err != nil {
+		return err, false
+	}
+
+	var d2 interface{}
+	err = json.Unmarshal([]byte(j2), &d2)
+
+	if err != nil {
+		return err, false
+	}
+
+	if reflect.DeepEqual(d1, d2) {
+		return nil, true
+	} else {
+		return nil, false
+	}
+}
+
+func IsEqualJSON(a, b string) (error, bool) {
+	err, r := deepEqualJSON(a, b)
+
+	if err != nil {
+		return err, false
+	} else if r {
+		return nil, true
+	} else {
+		return nil, false
+	}
+}
+
+func CreateSeedData(inst aetest.Instance) error {
+	req, err := inst.NewRequest("PUT", "", nil)
+	if err != nil {
+		err = errors.Wrap(err, "Failed to create req")
+		return err
+	}
+	req.Header.Set("Authorization", "Bearer "+AuthToken)
+	g := goon.NewGoon(req)
+
+	user := &entity.User{UserID: "test-sub", Name: "test name", IconPath: "test path"}
+	userKey, err := g.Put(user)
+	if err != nil {
+		err = errors.Wrap(err, "Failed to g.Put")
+		return err
+	}
+	comment := &entity.Comment{CommentText: "test comment!", MovieID: 550, UserKey: userKey}
+	_, err = g.Put(comment)
+	if err != nil {
+		err = errors.Wrap(err, "Failed to g.Put")
+		return err
+	}
+	return nil
 }

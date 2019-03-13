@@ -55,6 +55,11 @@ func TestCommentController_GetComments(t *testing.T) {
 	}
 	defer inst.Close()
 
+	err = CreateSeedData(inst)
+	if err != nil {
+		t.Fatalf("Failed to create seed data: %v", err)
+	}
+
 	req, err := inst.NewRequest("GET", "/api/v1/movies/550/comments", nil)
 	if err != nil {
 		t.Fatalf("Failed to create req: %v", err)
@@ -73,8 +78,19 @@ func TestCommentController_GetComments(t *testing.T) {
 		t.Fatalf("got statusCode: %v, want statusCode: %v", res.Code, wantStatusCode)
 	}
 
-	_, err = ioutil.ReadAll(res.Body)
+	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		t.Fatalf("Failed to read res.Body: %v", err)
+	}
+
+	actual := string(body)
+	expected := `[{"comment_id":5629499534213120,"comment_text":"test comment!","mine":true,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z","user_id":"test-sub","name":"test name","icon_path":"test path"}]`
+
+	err, ok := IsEqualJSON(actual, expected)
+	if err != nil {
+		t.Fatalf("IsEqualJSON error: %v", err)
+	}
+	if !ok {
+		t.Fatalf("not equal json. actual: %v, expected: %v", actual, expected)
 	}
 }
