@@ -15,7 +15,7 @@ import (
 type MockMuxCommentRepository struct{}
 
 func (mock *MockMuxCommentRepository) Find(r *http.Request, key string) string {
-	return "550"
+	return "1"
 }
 
 func TestCommentController_CreateComment(t *testing.T) {
@@ -29,7 +29,7 @@ func TestCommentController_CreateComment(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to json.Marshal: %v", err)
 	}
-	req, err := inst.NewRequest("PUT", "/api/v1/movies/550/comments", bytes.NewBuffer(c))
+	req, err := inst.NewRequest("PUT", "/api/v1/movies/1/comments", bytes.NewBuffer(c))
 	if err != nil {
 		t.Fatalf("Failed to create req: %v", err)
 	}
@@ -60,7 +60,7 @@ func TestCommentController_GetComments(t *testing.T) {
 		t.Fatalf("Failed to create seed data: %v", err)
 	}
 
-	req, err := inst.NewRequest("GET", "/api/v1/movies/550/comments", nil)
+	req, err := inst.NewRequest("GET", "/api/v1/movies/1/comments?page=1", nil)
 	if err != nil {
 		t.Fatalf("Failed to create req: %v", err)
 	}

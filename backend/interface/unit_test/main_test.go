@@ -183,7 +183,7 @@ func CreateSeedData(inst aetest.Instance) error {
 		err = errors.Wrap(err, "Failed to g.Put")
 		return err
 	}
-	comment := &entity.Comment{CommentText: "test comment!", MovieID: 550, UserKey: userKey}
+	comment := &entity.Comment{CommentText: "test comment!", MovieID: 1, UserKey: userKey}
 	_, err = g.Put(comment)
 	if err != nil {
 		err = errors.Wrap(err, "Failed to g.Put")
